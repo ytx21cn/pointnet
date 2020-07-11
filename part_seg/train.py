@@ -84,10 +84,10 @@ def printout(flog, data):
 	flog.write(data + '\n')
 
 def placeholder_inputs():
-    pointclouds_ph = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, point_num, 3))
-    input_label_ph = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, NUM_CATEGORIES))
-    labels_ph = tf.compat.v1.placeholder(tf.int32, shape=(batch_size))
-    seg_ph = tf.compat.v1.placeholder(tf.int32, shape=(batch_size, point_num))
+    pointclouds_ph = tf.placeholder(tf.float32, shape=(batch_size, point_num, 3))
+    input_label_ph = tf.placeholder(tf.float32, shape=(batch_size, NUM_CATEGORIES))
+    labels_ph = tf.placeholder(tf.int32, shape=(batch_size))
+    seg_ph = tf.placeholder(tf.int32, shape=(batch_size, point_num))
     return pointclouds_ph, input_label_ph, labels_ph, seg_ph
 
 def convert_label_to_one_hot(labels):
@@ -100,10 +100,10 @@ def train():
     with tf.Graph().as_default():
         with tf.device('/gpu:'+str(FLAGS.gpu)):
             pointclouds_ph, input_label_ph, labels_ph, seg_ph = placeholder_inputs()
-            is_training_ph = tf.compat.v1.placeholder(tf.bool, shape=())
+            is_training_ph = tf.placeholder(tf.bool, shape=())
 
             batch = tf.Variable(0, trainable=False)
-            learning_rate = tf.compat.v1.train.exponential_decay(
+            learning_rate = tf.train.exponential_decay(
                             BASE_LEARNING_RATE,     # base learning rate
                             batch * batch_size,     # global_var indicating the number of steps
                             DECAY_STEP,             # step size
@@ -111,8 +111,8 @@ def train():
                             staircase=True          # Stair-case or continuous decreasing
                             )
             learning_rate = tf.maximum(learning_rate, LEARNING_RATE_CLIP)
-
-            bn_momentum = tf.compat.v1.train.exponential_decay(
+        
+            bn_momentum = tf.train.exponential_decay(
                       BN_INIT_DECAY,
                       batch*batch_size,
                       BN_DECAY_DECAY_STEP,
@@ -120,10 +120,10 @@ def train():
                       staircase=True)
             bn_decay = tf.minimum(BN_DECAY_CLIP, 1 - bn_momentum)
 
-            lr_op = tf.compat.v1.summary.scalar('learning_rate', learning_rate)
-            batch_op = tf.compat.v1.summary.scalar('batch_number', batch)
-            bn_decay_op = tf.compat.v1.summary.scalar('bn_decay', bn_decay)
-
+            lr_op = tf.summary.scalar('learning_rate', learning_rate)
+            batch_op = tf.summary.scalar('batch_number', batch)
+            bn_decay_op = tf.summary.scalar('bn_decay', bn_decay)
+ 
             labels_pred, seg_pred, end_points = model.get_model(pointclouds_ph, input_label_ph, \
                     is_training=is_training_ph, bn_decay=bn_decay, cat_num=NUM_CATEGORIES, \
                     part_num=NUM_PART_CATS, batch_size=batch_size, num_point=point_num, weight_decay=FLAGS.wd)
@@ -134,57 +134,57 @@ def train():
             loss, label_loss, per_instance_label_loss, seg_loss, per_instance_seg_loss, per_instance_seg_pred_res  \
                 = model.get_loss(labels_pred, seg_pred, labels_ph, seg_ph, 1.0, end_points)
 
-            total_training_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            total_testing_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            total_training_loss_ph = tf.placeholder(tf.float32, shape=())
+            total_testing_loss_ph = tf.placeholder(tf.float32, shape=())
 
-            label_training_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            label_testing_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            label_training_loss_ph = tf.placeholder(tf.float32, shape=())
+            label_testing_loss_ph = tf.placeholder(tf.float32, shape=())
 
-            seg_training_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            seg_testing_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            seg_training_loss_ph = tf.placeholder(tf.float32, shape=())
+            seg_testing_loss_ph = tf.placeholder(tf.float32, shape=())
 
-            label_training_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            label_testing_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            label_testing_acc_avg_cat_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            label_training_acc_ph = tf.placeholder(tf.float32, shape=())
+            label_testing_acc_ph = tf.placeholder(tf.float32, shape=())
+            label_testing_acc_avg_cat_ph = tf.placeholder(tf.float32, shape=())
 
-            seg_training_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            seg_testing_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
-            seg_testing_acc_avg_cat_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            seg_training_acc_ph = tf.placeholder(tf.float32, shape=())
+            seg_testing_acc_ph = tf.placeholder(tf.float32, shape=())
+            seg_testing_acc_avg_cat_ph = tf.placeholder(tf.float32, shape=())
 
-            total_train_loss_sum_op = tf.compat.v1.summary.scalar('total_training_loss', total_training_loss_ph)
-            total_test_loss_sum_op = tf.compat.v1.summary.scalar('total_testing_loss', total_testing_loss_ph)
+            total_train_loss_sum_op = tf.summary.scalar('total_training_loss', total_training_loss_ph)
+            total_test_loss_sum_op = tf.summary.scalar('total_testing_loss', total_testing_loss_ph)
 
-            label_train_loss_sum_op = tf.compat.v1.summary.scalar('label_training_loss', label_training_loss_ph)
-            label_test_loss_sum_op = tf.compat.v1.summary.scalar('label_testing_loss', label_testing_loss_ph)
+            label_train_loss_sum_op = tf.summary.scalar('label_training_loss', label_training_loss_ph)
+            label_test_loss_sum_op = tf.summary.scalar('label_testing_loss', label_testing_loss_ph)
 
-            seg_train_loss_sum_op = tf.compat.v1.summary.scalar('seg_training_loss', seg_training_loss_ph)
-            seg_test_loss_sum_op = tf.compat.v1.summary.scalar('seg_testing_loss', seg_testing_loss_ph)
+            seg_train_loss_sum_op = tf.summary.scalar('seg_training_loss', seg_training_loss_ph)
+            seg_test_loss_sum_op = tf.summary.scalar('seg_testing_loss', seg_testing_loss_ph)
 
-            label_train_acc_sum_op = tf.compat.v1.summary.scalar('label_training_acc', label_training_acc_ph)
-            label_test_acc_sum_op = tf.compat.v1.summary.scalar('label_testing_acc', label_testing_acc_ph)
-            label_test_acc_avg_cat_op = tf.compat.v1.summary.scalar('label_testing_acc_avg_cat', label_testing_acc_avg_cat_ph)
+            label_train_acc_sum_op = tf.summary.scalar('label_training_acc', label_training_acc_ph)
+            label_test_acc_sum_op = tf.summary.scalar('label_testing_acc', label_testing_acc_ph)
+            label_test_acc_avg_cat_op = tf.summary.scalar('label_testing_acc_avg_cat', label_testing_acc_avg_cat_ph)
 
-            seg_train_acc_sum_op = tf.compat.v1.summary.scalar('seg_training_acc', seg_training_acc_ph)
-            seg_test_acc_sum_op = tf.compat.v1.summary.scalar('seg_testing_acc', seg_testing_acc_ph)
-            seg_test_acc_avg_cat_op = tf.compat.v1.summary.scalar('seg_testing_acc_avg_cat', seg_testing_acc_avg_cat_ph)
+            seg_train_acc_sum_op = tf.summary.scalar('seg_training_acc', seg_training_acc_ph)
+            seg_test_acc_sum_op = tf.summary.scalar('seg_testing_acc', seg_testing_acc_ph)
+            seg_test_acc_avg_cat_op = tf.summary.scalar('seg_testing_acc_avg_cat', seg_testing_acc_avg_cat_ph)
 
             train_variables = tf.trainable_variables()
 
-            trainer = tf.compat.v1.train.AdamOptimizer(learning_rate)
+            trainer = tf.train.AdamOptimizer(learning_rate)
             train_op = trainer.minimize(loss, var_list=train_variables, global_step=batch)
 
-        saver = tf.compat.v1.train.Saver()
+        saver = tf.train.Saver()
 
-        config = tf.compat.v1.ConfigProto()
+        config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         config.allow_soft_placement = True
-        sess = tf.compat.v1.Session(config=config)
-
-        init = tf.compat.v1.global_variables_initializer()
+        sess = tf.Session(config=config)
+        
+        init = tf.global_variables_initializer()
         sess.run(init)
 
-        train_writer = tf.compat.v1.summary.FileWriter(SUMMARIES_FOLDER + '/train', sess.graph)
-        test_writer = tf.compat.v1.summary.FileWriter(SUMMARIES_FOLDER + '/test')
+        train_writer = tf.summary.FileWriter(SUMMARIES_FOLDER + '/train', sess.graph)
+        test_writer = tf.summary.FileWriter(SUMMARIES_FOLDER + '/test')
 
         train_file_list = provider.getDataFiles(TRAINING_FILE_LIST)
         num_train_file = len(train_file_list)
@@ -225,11 +225,11 @@ def train():
                     endidx = (j + 1) * batch_size
 
                     feed_dict = {
-                            pointclouds_ph: cur_data[begidx: endidx, ...],
-                            labels_ph: cur_labels[begidx: endidx, ...],
-                            input_label_ph: cur_labels_one_hot[begidx: endidx, ...],
+                            pointclouds_ph: cur_data[begidx: endidx, ...], 
+                            labels_ph: cur_labels[begidx: endidx, ...], 
+                            input_label_ph: cur_labels_one_hot[begidx: endidx, ...], 
                             seg_ph: cur_seg[begidx: endidx, ...],
-                            is_training_ph: is_training,
+                            is_training_ph: is_training, 
                             }
 
                     _, loss_val, label_loss_val, seg_loss_val, per_instance_label_loss_val, \
@@ -244,7 +244,7 @@ def train():
                     total_loss += loss_val
                     total_label_loss += label_loss_val
                     total_seg_loss += seg_loss_val
-
+                    
                     per_instance_label_pred = np.argmax(label_pred_val, axis=1)
                     total_label_acc += np.mean(np.float32(per_instance_label_pred == cur_labels[begidx: endidx, ...]))
                     total_seg_acc += average_part_acc
@@ -308,11 +308,11 @@ def train():
                     begidx = j * batch_size
                     endidx = (j + 1) * batch_size
                     feed_dict = {
-                            pointclouds_ph: cur_data[begidx: endidx, ...],
-                            labels_ph: cur_labels[begidx: endidx, ...],
-                            input_label_ph: cur_labels_one_hot[begidx: endidx, ...],
+                            pointclouds_ph: cur_data[begidx: endidx, ...], 
+                            labels_ph: cur_labels[begidx: endidx, ...], 
+                            input_label_ph: cur_labels_one_hot[begidx: endidx, ...], 
                             seg_ph: cur_seg[begidx: endidx, ...],
-                            is_training_ph: is_training,
+                            is_training_ph: is_training, 
                             }
 
                     loss_val, label_loss_val, seg_loss_val, per_instance_label_loss_val, \
@@ -328,7 +328,7 @@ def train():
                     total_loss += loss_val
                     total_label_loss += label_loss_val
                     total_seg_loss += seg_loss_val
-
+                    
                     per_instance_label_pred = np.argmax(label_pred_val, axis=1)
                     total_label_acc += np.mean(np.float32(per_instance_label_pred == cur_labels[begidx: endidx, ...]))
                     total_seg_acc += average_part_acc

@@ -88,8 +88,8 @@ def pc_normalize(pc):
     return pc
 
 def placeholder_inputs():
-    pointclouds_ph = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, point_num, 3))
-    input_label_ph = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, NUM_OBJ_CATS))
+    pointclouds_ph = tf.placeholder(tf.float32, shape=(batch_size, point_num, 3))
+    input_label_ph = tf.placeholder(tf.float32, shape=(batch_size, NUM_OBJ_CATS))
     return pointclouds_ph, input_label_ph
 
 def output_color_point_cloud(data, seg, out_file):
@@ -125,27 +125,27 @@ def convert_label_to_one_hot(labels):
 
 def predict():
     is_training = False
-
+    
     with tf.device('/gpu:'+str(gpu_to_use)):
         pointclouds_ph, input_label_ph = placeholder_inputs()
-        is_training_ph = tf.compat.v1.placeholder(tf.bool, shape=())
+        is_training_ph = tf.placeholder(tf.bool, shape=())
 
         # simple model
         pred, seg_pred, end_points = model.get_model(pointclouds_ph, input_label_ph, \
                 cat_num=NUM_OBJ_CATS, part_num=NUM_PART_CATS, is_training=is_training_ph, \
                 batch_size=batch_size, num_point=point_num, weight_decay=0.0, bn_decay=None)
-
+        
     # Add ops to save and restore all the variables.
-    saver = tf.compat.v1.train.Saver()
+    saver = tf.train.Saver()
 
     # Later, launch the model, use the saver to restore variables from disk, and
     # do some work with the model.
-
-    config = tf.compat.v1.ConfigProto()
+    
+    config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
 
-    with tf.compat.v1.Session(config=config) as sess:
+    with tf.Session(config=config) as sess:
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
@@ -155,7 +155,7 @@ def predict():
         printout(flog, 'Loading model %s' % pretrained_model_path)
         saver.restore(sess, pretrained_model_path)
         printout(flog, 'Model restored.')
-
+        
         # Note: the evaluation for the model with BN has to have some statistics
         # Using some test datas as the statistics
         batch_data = np.zeros([batch_size, point_num, 3]).astype(np.float32)
@@ -195,12 +195,12 @@ def predict():
 
             label_pred_val, seg_pred_res = sess.run([pred, seg_pred], feed_dict={
                         pointclouds_ph: batch_data,
-                        input_label_ph: cur_label_one_hot,
+                        input_label_ph: cur_label_one_hot, 
                         is_training_ph: is_training,
                     })
 
             label_pred_val = np.argmax(label_pred_val[0, :])
-
+            
             seg_pred_res = seg_pred_res[0, ...]
 
             iou_oids = object2setofoid[objcats[cur_gt_label]]
@@ -239,11 +239,11 @@ def predict():
             avg_iou = total_iou / len(iou_oids)
             total_acc_iou += avg_iou
             total_per_cat_iou[cur_gt_label] += avg_iou
-
+            
             if output_verbose:
                 output_color_point_cloud(pts, seg, os.path.join(output_dir, str(shape_idx)+'_gt.obj'))
                 output_color_point_cloud(pts, seg_pred_val, os.path.join(output_dir, str(shape_idx)+'_pred.obj'))
-                output_color_point_cloud_red_blue(pts, np.int32(seg == seg_pred_val),
+                output_color_point_cloud_red_blue(pts, np.int32(seg == seg_pred_val), 
                         os.path.join(output_dir, str(shape_idx)+'_diff.obj'))
 
                 with open(os.path.join(output_dir, str(shape_idx)+'.log'), 'w') as fout:
@@ -265,6 +265,6 @@ def predict():
                 printout(flog, '\t ' + objcats[cat_idx] + ' IoU: '+ \
                         str(total_per_cat_iou[cat_idx] / total_per_cat_seen[cat_idx]))
 
-
+                
 with tf.Graph().as_default():
     predict()

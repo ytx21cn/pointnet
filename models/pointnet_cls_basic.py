@@ -9,19 +9,18 @@ sys.path.append(os.path.join(BASE_DIR, '../utils'))
 import tf_util
 
 def placeholder_inputs(batch_size, num_point):
-    pointclouds_pl = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, num_point, 3))
-    labels_pl = tf.compat.v1.placeholder(tf.int32, shape=(batch_size))
+    pointclouds_pl = tf.placeholder(tf.float32, shape=(batch_size, num_point, 3))
+    labels_pl = tf.placeholder(tf.int32, shape=(batch_size))
     return pointclouds_pl, labels_pl
 
 
 def get_model(point_cloud, is_training, bn_decay=None):
     """ Classification PointNet, input is BxNx3, output Bx40 """
-    point_cloud_shape = point_cloud.get_shape()
-    batch_size = int(point_cloud_shape[0])
-    num_point = int(point_cloud_shape[1])
+    batch_size = point_cloud.get_shape()[0].value
+    num_point = point_cloud.get_shape()[1].value
     end_points = {}
     input_image = tf.expand_dims(point_cloud, -1)
-
+    
     # Point functions (MLP implemented as conv2d)
     net = tf_util.conv2d(input_image, 64, [1,3],
                          padding='VALID', stride=[1,1],
@@ -47,7 +46,7 @@ def get_model(point_cloud, is_training, bn_decay=None):
     # Symmetric function: max pooling
     net = tf_util.max_pool2d(net, [num_point,1],
                              padding='VALID', scope='maxpool')
-
+    
     # MLP on global point cloud vector
     net = tf.reshape(net, [batch_size, -1])
     net = tf_util.fully_connected(net, 512, bn=True, is_training=is_training,
@@ -66,7 +65,7 @@ def get_loss(pred, label, end_points):
         label: B, """
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=label)
     classify_loss = tf.reduce_mean(loss)
-    tf.compat.v1.summary.scalar('classify loss', classify_loss)
+    tf.summary.scalar('classify loss', classify_loss)
     return classify_loss
 
 

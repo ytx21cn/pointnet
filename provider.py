@@ -2,7 +2,6 @@ import os
 import sys
 import numpy as np
 import h5py
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 
@@ -13,7 +12,7 @@ if not os.path.exists(DATA_DIR):
 if not os.path.exists(os.path.join(DATA_DIR, 'modelnet40_ply_hdf5_2048')):
     www = 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
     zipfile = os.path.basename(www)
-    os.system('wget --no-check-certificate %s; unzip %s' % (www, zipfile))
+    os.system('wget %s; unzip %s' % (www, zipfile))
     os.system('mv %s %s' % (zipfile[:-4], DATA_DIR))
     os.system('rm %s' % (zipfile))
 
@@ -61,7 +60,7 @@ def rotate_point_cloud_by_angle(batch_data, rotation_angle):
     """
     rotated_data = np.zeros(batch_data.shape, dtype=np.float32)
     for k in range(batch_data.shape[0]):
-        # rotation_angle = np.random.uniform() * 2 * np.pi
+        #rotation_angle = np.random.uniform() * 2 * np.pi
         cosval = np.cos(rotation_angle)
         sinval = np.sin(rotation_angle)
         rotation_matrix = np.array([[cosval, 0, sinval],
@@ -80,26 +79,22 @@ def jitter_point_cloud(batch_data, sigma=0.01, clip=0.05):
           BxNx3 array, jittered batch of point clouds
     """
     B, N, C = batch_data.shape
-    assert (clip > 0)
-    jittered_data = np.clip(sigma * np.random.randn(B, N, C), -1 * clip, clip)
+    assert(clip > 0)
+    jittered_data = np.clip(sigma * np.random.randn(B, N, C), -1*clip, clip)
     jittered_data += batch_data
     return jittered_data
 
-
 def getDataFiles(list_filename):
     return [line.rstrip() for line in open(list_filename)]
-
 
 def load_h5(h5_filename):
     f = h5py.File(h5_filename)
     data = f['data'][:]
     label = f['label'][:]
-    return data, label
-
+    return (data, label)
 
 def loadDataFile(filename):
     return load_h5(filename)
-
 
 def load_h5_data_label_seg(h5_filename):
     f = h5py.File(h5_filename)

@@ -3,20 +3,18 @@ import numpy as np
 import math
 import os
 import sys
-
-from utils import tf_util
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(BASE_DIR))
 sys.path.append(os.path.join(BASE_DIR, '../utils'))
+import tf_util
 
 
 def get_transform_K(inputs, is_training, bn_decay=None, K = 3):
     """ Transform Net, input is BxNx1xK gray image
         Return:
             Transformation matrix of size KxK """
-    batch_size = int(inputs.get_shape()[0])
-    num_point = int(inputs.get_shape()[1])
+    batch_size = inputs.get_shape()[0].value
+    num_point = inputs.get_shape()[1].value
 
     net = tf_util.conv2d(inputs, 256, [1,1], padding='VALID', stride=[1,1],
                          bn=True, is_training=is_training, scope='tconv1', bn_decay=bn_decay)
@@ -28,9 +26,9 @@ def get_transform_K(inputs, is_training, bn_decay=None, K = 3):
     net = tf_util.fully_connected(net, 512, bn=True, is_training=is_training, scope='tfc1', bn_decay=bn_decay)
     net = tf_util.fully_connected(net, 256, bn=True, is_training=is_training, scope='tfc2', bn_decay=bn_decay)
 
-    with tf.compat.v1.variable_scope('transform_feat') as sc:
-        weights = tf.compat.v1.get_variable('weights', [256, K*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32)
-        biases = tf.compat.v1.get_variable('biases', [K*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32) + tf.constant(np.eye(K).flatten(), dtype=tf.float32)
+    with tf.variable_scope('transform_feat') as sc:
+        weights = tf.get_variable('weights', [256, K*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32)
+        biases = tf.get_variable('biases', [K*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32) + tf.constant(np.eye(K).flatten(), dtype=tf.float32)
         transform = tf.matmul(net, weights)
         transform = tf.nn.bias_add(transform, biases)
 
@@ -46,10 +44,8 @@ def get_transform(point_cloud, is_training, bn_decay=None, K = 3):
     """ Transform Net, input is BxNx3 gray image
         Return:
             Transformation matrix of size 3xK """
-
-    point_cloud_shape = point_cloud.get_shape()
-    batch_size = int(point_cloud_shape[0])
-    num_point = int(point_cloud_shape[1])
+    batch_size = point_cloud.get_shape()[0].value
+    num_point = point_cloud.get_shape()[1].value
 
     input_image = tf.expand_dims(point_cloud, -1)
     net = tf_util.conv2d(input_image, 64, [1,3], padding='VALID', stride=[1,1],
@@ -64,10 +60,10 @@ def get_transform(point_cloud, is_training, bn_decay=None, K = 3):
     net = tf_util.fully_connected(net, 128, bn=True, is_training=is_training, scope='tfc1', bn_decay=bn_decay)
     net = tf_util.fully_connected(net, 128, bn=True, is_training=is_training, scope='tfc2', bn_decay=bn_decay)
 
-    with tf.compat.v1.variable_scope('transform_XYZ') as sc:
+    with tf.variable_scope('transform_XYZ') as sc:
         assert(K==3)
-        weights = tf.compat.v1.get_variable('weights', [128, 3*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32)
-        biases = tf.compat.v1.get_variable('biases', [3*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32) + tf.constant([1,0,0,0,1,0,0,0,1], dtype=tf.float32)
+        weights = tf.get_variable('weights', [128, 3*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32)
+        biases = tf.get_variable('biases', [3*K], initializer=tf.constant_initializer(0.0), dtype=tf.float32) + tf.constant([1,0,0,0,1,0,0,0,1], dtype=tf.float32)
         transform = tf.matmul(net, weights)
         transform = tf.nn.bias_add(transform, biases)
 
@@ -81,7 +77,7 @@ def get_model(point_cloud, input_label, is_training, cat_num, part_num, \
     """ ConvNet baseline, input is BxNx3 gray image """
     end_points = {}
 
-    with tf.compat.v1.variable_scope('transform_net1') as sc:
+    with tf.variable_scope('transform_net1') as sc:
         K = 3
         transform = get_transform(point_cloud, is_training, bn_decay, K = 3)
     point_cloud_transformed = tf.matmul(point_cloud, transform)
@@ -95,7 +91,7 @@ def get_model(point_cloud, input_label, is_training, cat_num, part_num, \
                          bn=True, is_training=is_training, scope='conv3', bn_decay=bn_decay)
 
 
-    with tf.compat.v1.variable_scope('transform_net2') as sc:
+    with tf.variable_scope('transform_net2') as sc:
         K = 128
         transform = get_transform_K(out3, is_training, bn_decay, K)
 
@@ -133,7 +129,7 @@ def get_model(point_cloud, input_label, is_training, cat_num, part_num, \
     net2 = tf_util.dropout(net2, keep_prob=0.8, is_training=is_training, scope='seg/dp2')
     net2 = tf_util.conv2d(net2, 128, [1,1], padding='VALID', stride=[1,1], bn_decay=bn_decay,
                         bn=True, is_training=is_training, scope='seg/conv3', weight_decay=weight_decay)
-    net2 = tf_util.conv2d(net2, part_num, [1,1], padding='VALID', stride=[1,1], activation_fn=None,
+    net2 = tf_util.conv2d(net2, part_num, [1,1], padding='VALID', stride=[1,1], activation_fn=None, 
                         bn=False, scope='seg/conv4', weight_decay=weight_decay)
 
     net2 = tf.reshape(net2, [batch_size, num_point, part_num])
@@ -150,13 +146,13 @@ def get_loss(l_pred, seg_pred, label, seg, weight, end_points):
     seg_loss = tf.reduce_mean(per_instance_seg_loss)
 
     per_instance_seg_pred_res = tf.argmax(seg_pred, 2)
-
+    
     # Enforce the transformation as orthogonal matrix
     transform = end_points['transform'] # BxKxK
-    K = transform.get_shape()[1]
+    K = transform.get_shape()[1].value
     mat_diff = tf.matmul(transform, tf.transpose(transform, perm=[0,2,1])) - tf.constant(np.eye(K), dtype=tf.float32)
-    mat_diff_loss = tf.nn.l2_loss(mat_diff)
-
+    mat_diff_loss = tf.nn.l2_loss(mat_diff) 
+    
 
     total_loss = weight * seg_loss + (1 - weight) * label_loss + mat_diff_loss * 1e-3
 
