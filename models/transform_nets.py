@@ -2,17 +2,21 @@ import tensorflow as tf
 import numpy as np
 import sys
 import os
+
+from utils import tf_util
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, '../utils'))
-import tf_util
+
 
 def input_transform_net(point_cloud, is_training, bn_decay=None, K=3):
     """ Input (XYZ) Transform Net, input is BxNx3 gray image
         Return:
             Transformation matrix of size 3xK """
-    batch_size = point_cloud.get_shape()[0].value
-    num_point = point_cloud.get_shape()[1].value
+    point_cloud_shape = point_cloud.get_shape()
+    batch_size = int(point_cloud_shape[0])
+    num_point = int(point_cloud_shape[1])
 
     input_image = tf.expand_dims(point_cloud, -1)
     net = tf_util.conv2d(input_image, 64, [1,3],
