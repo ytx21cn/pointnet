@@ -7,6 +7,7 @@ Date: November 2016
 import numpy as np
 import tensorflow as tf
 
+
 def _variable_on_cpu(name, shape, initializer, use_fp16=False):
     """Helper to create a Variable stored on CPU memory.
     Args:
@@ -110,8 +111,6 @@ def conv1d(inputs,
         return outputs
 
 
-
-
 def conv2d(inputs,
            num_output_channels,
            kernel_size,
@@ -212,7 +211,7 @@ def conv2d_transpose(inputs,
         kernel_h, kernel_w = kernel_size
         num_in_channels = int(inputs.get_shape()[-1])
         kernel_shape = [kernel_h, kernel_w,
-                        num_output_channels, num_in_channels] # reversed to conv2d
+                        num_output_channels, num_in_channels]  # reversed to conv2d
         kernel = _variable_with_weight_decay('weights',
                                              shape=kernel_shape,
                                              use_xavier=use_xavier,
@@ -251,7 +250,6 @@ def conv2d_transpose(inputs,
         if activation_fn is not None:
             outputs = activation_fn(outputs)
         return outputs
-
 
 
 def conv3d(inputs,
@@ -312,6 +310,7 @@ def conv3d(inputs,
         if activation_fn is not None:
             outputs = activation_fn(outputs)
         return outputs
+
 
 def fully_connected(inputs,
                     num_outputs,
@@ -377,6 +376,7 @@ def max_pool2d(inputs,
                                  name=sc.name)
         return outputs
 
+
 def avg_pool2d(inputs,
                kernel_size,
                scope,
@@ -428,6 +428,7 @@ def max_pool3d(inputs,
                                    name=sc.name)
         return outputs
 
+
 def avg_pool3d(inputs,
                kernel_size,
                scope,
@@ -452,9 +453,6 @@ def avg_pool3d(inputs,
                                    padding=padding,
                                    name=sc.name)
         return outputs
-
-
-
 
 
 def batch_norm_template(inputs, is_training, scope, moments_dims, bn_decay):
@@ -508,7 +506,7 @@ def batch_norm_for_fc(inputs, is_training, bn_decay, scope):
     Return:
         normed:      batch-normalized maps
     """
-    return batch_norm_template(inputs, is_training, scope, [0,], bn_decay)
+    return batch_norm_template(inputs, is_training, scope, [0, ], bn_decay)
 
 
 def batch_norm_for_conv1d(inputs, is_training, bn_decay, scope):
@@ -522,9 +520,7 @@ def batch_norm_for_conv1d(inputs, is_training, bn_decay, scope):
     Return:
         normed:      batch-normalized maps
     """
-    return batch_norm_template(inputs, is_training, scope, [0,1], bn_decay)
-
-
+    return batch_norm_template(inputs, is_training, scope, [0, 1], bn_decay)
 
 
 def batch_norm_for_conv2d(inputs, is_training, bn_decay, scope):
@@ -538,8 +534,7 @@ def batch_norm_for_conv2d(inputs, is_training, bn_decay, scope):
     Return:
         normed:      batch-normalized maps
     """
-    return batch_norm_template(inputs, is_training, scope, [0,1,2], bn_decay)
-
+    return batch_norm_template(inputs, is_training, scope, [0, 1, 2], bn_decay)
 
 
 def batch_norm_for_conv3d(inputs, is_training, bn_decay, scope):
@@ -553,7 +548,7 @@ def batch_norm_for_conv3d(inputs, is_training, bn_decay, scope):
     Return:
         normed:      batch-normalized maps
     """
-    return batch_norm_template(inputs, is_training, scope, [0,1,2,3], bn_decay)
+    return batch_norm_template(inputs, is_training, scope, [0, 1, 2, 3], bn_decay)
 
 
 def dropout(inputs,
