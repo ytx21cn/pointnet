@@ -39,7 +39,7 @@ def get_model(point_cloud, is_training, bn_decay=None):
                          bn=True, is_training=is_training,
                          scope='conv2', bn_decay=bn_decay)
 
-    with tf.variable_scope('transform_net2') as sc:
+    with tf.compat.v1.variable_scope('transform_net2') as sc:
         transform = feature_transform_net(net, is_training, bn_decay, K=64)
     end_points['transform'] = transform
     net_transformed = tf.matmul(tf.squeeze(net, axis=[2]), transform)
