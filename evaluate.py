@@ -8,12 +8,13 @@ import os
 import scipy.misc
 import sys
 
+import provider
+from utils import pc_util
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, 'models'))
 sys.path.append(os.path.join(BASE_DIR, 'utils'))
-import provider
-import pc_util
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
@@ -66,10 +67,10 @@ def evaluate(num_votes):
         loss = MODEL.get_loss(pred, labels_pl, end_points)
 
         # Add ops to save and restore all the variables.
-        saver = tf.train.Saver()
+        saver = tf.compat.v1.train.Saver()
 
     # Create a session
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     config.log_device_placement = True

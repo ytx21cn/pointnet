@@ -18,8 +18,9 @@ def placeholder_inputs(batch_size, num_point):
 
 def get_model(point_cloud, is_training, bn_decay=None):
     """ ConvNet baseline, input is BxNx3 gray image """
-    batch_size = point_cloud.get_shape()[0].value
-    num_point = point_cloud.get_shape()[1].value
+    point_cloud_shape = point_cloud.get_shape()
+    batch_size = int(point_cloud_shape[0])
+    num_point = int(point_cloud_shape[1])
 
     input_image = tf.expand_dims(point_cloud, -1)
     # CONV
@@ -40,12 +41,12 @@ def get_model(point_cloud, is_training, bn_decay=None):
     pc_feat1 = tf_util.fully_connected(pc_feat1, 256, bn=True, is_training=is_training, scope='fc1', bn_decay=bn_decay)
     pc_feat1 = tf_util.fully_connected(pc_feat1, 128, bn=True, is_training=is_training, scope='fc2', bn_decay=bn_decay)
     print(pc_feat1)
-   
-    # CONCAT 
+
+    # CONCAT
     pc_feat1_expand = tf.tile(tf.reshape(pc_feat1, [batch_size, 1, 1, -1]), [1, num_point, 1, 1])
     points_feat1_concat = tf.concat(axis=3, values=[points_feat1, pc_feat1_expand])
-    
-    # CONV 
+
+    # CONV
     net = tf_util.conv2d(points_feat1_concat, 512, [1,1], padding='VALID', stride=[1,1],
                          bn=True, is_training=is_training, scope='conv6')
     net = tf_util.conv2d(net, 256, [1,1], padding='VALID', stride=[1,1],

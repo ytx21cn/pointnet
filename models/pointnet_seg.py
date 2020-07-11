@@ -3,11 +3,14 @@ import numpy as np
 import math
 import sys
 import os
+
+from utils import tf_util
+from transform_nets import input_transform_net, feature_transform_net
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, '../utils'))
-import tf_util
-from transform_nets import input_transform_net, feature_transform_net
+
 
 def placeholder_inputs(batch_size, num_point):
     pointclouds_pl = tf.compat.v1.placeholder(tf.float32,
@@ -19,8 +22,9 @@ def placeholder_inputs(batch_size, num_point):
 
 def get_model(point_cloud, is_training, bn_decay=None):
     """ Classification PointNet, input is BxNx3, output BxNx50 """
-    batch_size = point_cloud.get_shape()[0].value
-    num_point = point_cloud.get_shape()[1].value
+    point_cloud_shape = point_cloud.get_shape()
+    batch_size = int(point_cloud_shape[0])
+    num_point = int(point_cloud_shape[1])
     end_points = {}
 
     with tf.compat.v1.variable_scope('transform_net1') as sc:
@@ -98,7 +102,7 @@ def get_loss(pred, label, end_points, reg_weight=0.001):
 
     # Enforce the transformation as orthogonal matrix
     transform = end_points['transform'] # BxKxK
-    K = transform.get_shape()[1].value
+    K = transform.get_shape()[1]
     mat_diff = tf.matmul(transform, tf.transpose(transform, perm=[0,2,1]))
     mat_diff -= tf.constant(np.eye(K), dtype=tf.float32)
     mat_diff_loss = tf.nn.l2_loss(mat_diff)

@@ -85,7 +85,7 @@ def get_loss(pred, label, end_points, reg_weight=0.001):
 
     # Enforce the transformation as orthogonal matrix
     transform = end_points['transform'] # BxKxK
-    K = transform.get_shape()[1].value
+    K = transform.get_shape()[1]
     mat_diff = tf.matmul(transform, tf.transpose(transform, perm=[0,2,1]))
     mat_diff -= tf.constant(np.eye(K), dtype=tf.float32)
     mat_diff_loss = tf.nn.l2_loss(mat_diff)
