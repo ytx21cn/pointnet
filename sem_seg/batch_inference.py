@@ -56,7 +56,7 @@ def evaluate():
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     config.log_device_placement = True
-    sess = tf.Session(config=config)
+    sess = tf.compat.v1.Session(config=config)
 
     # Restore variables from disk.
     saver.restore(sess, MODEL_PATH)

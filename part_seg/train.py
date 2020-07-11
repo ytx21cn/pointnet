@@ -178,7 +178,7 @@ def train():
         config = tf.compat.v1.ConfigProto()
         config.gpu_options.allow_growth = True
         config.allow_soft_placement = True
-        sess = tf.Session(config=config)
+        sess = tf.compat.v1.Session(config=config)
 
         init = tf.compat.v1.global_variables_initializer()
         sess.run(init)

@@ -145,7 +145,7 @@ def predict():
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
 
-    with tf.Session(config=config) as sess:
+    with tf.compat.v1.Session(config=config) as sess:
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 

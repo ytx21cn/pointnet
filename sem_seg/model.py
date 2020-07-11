@@ -68,7 +68,7 @@ if __name__ == "__main__":
     with tf.Graph().as_default():
         a = tf.compat.v1.placeholder(tf.float32, shape=(32,4096,9))
         net = get_model(a, tf.constant(True))
-        with tf.Session() as sess:
+        with tf.compat.v1.Session() as sess:
             init = tf.compat.v1.global_variables_initializer()
             sess.run(init)
             start = time.time()
