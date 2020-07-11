@@ -478,7 +478,7 @@ def batch_norm_template(inputs, is_training, scope, moments_dims, bn_decay):
                             name='gamma', trainable=True)
         batch_mean, batch_var = tf.nn.moments(inputs, moments_dims, name='moments')
         decay = bn_decay if bn_decay is not None else 0.9
-        ema = tf.train.ExponentialMovingAverage(decay=decay)
+        ema = tf.compat.v1.train.ExponentialMovingAverage(decay=decay)
         # Operator that maintains moving averages of variables.
         ema_apply_op = tf.cond(is_training,
                                lambda: ema.apply([batch_mean, batch_var]),

@@ -69,7 +69,7 @@ if __name__ == "__main__":
         a = tf.compat.v1.placeholder(tf.float32, shape=(32,4096,9))
         net = get_model(a, tf.constant(True))
         with tf.Session() as sess:
-            init = tf.global_variables_initializer()
+            init = tf.compat.v1.global_variables_initializer()
             sess.run(init)
             start = time.time()
             for i in range(100):
