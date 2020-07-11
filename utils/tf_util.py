@@ -471,7 +471,7 @@ def batch_norm_template(inputs, is_training, scope, moments_dims, bn_decay):
         normed:        batch-normalized maps
     """
     with tf.compat.v1.variable_scope(scope) as sc:
-        num_channels = int(inputs.get_shape())
+        num_channels = int(inputs.get_shape()[-1])
         beta = tf.Variable(tf.constant(0.0, shape=[num_channels]),
                            name='beta', trainable=True)
         gamma = tf.Variable(tf.constant(1.0, shape=[num_channels]),

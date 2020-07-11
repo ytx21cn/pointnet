@@ -42,10 +42,10 @@ def input_transform_net(point_cloud, is_training, bn_decay=None, K=3):
 
     with tf.compat.v1.variable_scope('transform_XYZ') as sc:
         assert(K==3)
-        weights = tf.get_variable('weights', [256, 3*K],
+        weights = tf.compat.v1.get_variable('weights', [256, 3*K],
                                   initializer=tf.constant_initializer(0.0),
                                   dtype=tf.float32)
-        biases = tf.get_variable('biases', [3*K],
+        biases = tf.compat.v1.get_variable('biases', [3*K],
                                  initializer=tf.constant_initializer(0.0),
                                  dtype=tf.float32)
         biases += tf.constant([1,0,0,0,1,0,0,0,1], dtype=tf.float32)
@@ -85,10 +85,10 @@ def feature_transform_net(inputs, is_training, bn_decay=None, K=64):
                                   scope='tfc2', bn_decay=bn_decay)
 
     with tf.compat.v1.variable_scope('transform_feat') as sc:
-        weights = tf.get_variable('weights', [256, K*K],
+        weights = tf.compat.v1.get_variable('weights', [256, K*K],
                                   initializer=tf.constant_initializer(0.0),
                                   dtype=tf.float32)
-        biases = tf.get_variable('biases', [K*K],
+        biases = tf.compat.v1.get_variable('biases', [K*K],
                                  initializer=tf.constant_initializer(0.0),
                                  dtype=tf.float32)
         biases += tf.constant(np.eye(K).flatten(), dtype=tf.float32)
