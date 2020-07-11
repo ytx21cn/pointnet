@@ -41,7 +41,7 @@ def evaluate():
      
     with tf.device('/gpu:'+str(GPU_INDEX)):
         pointclouds_pl, labels_pl = placeholder_inputs(BATCH_SIZE, NUM_POINT)
-        is_training_pl = tf.placeholder(tf.bool, shape=())
+        is_training_pl = tf.compat.v1.placeholder(tf.bool, shape=())
 
         # simple model
         pred = get_model(pointclouds_pl, is_training_pl)

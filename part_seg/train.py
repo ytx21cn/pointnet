@@ -84,10 +84,10 @@ def printout(flog, data):
 	flog.write(data + '\n')
 
 def placeholder_inputs():
-    pointclouds_ph = tf.placeholder(tf.float32, shape=(batch_size, point_num, 3))
-    input_label_ph = tf.placeholder(tf.float32, shape=(batch_size, NUM_CATEGORIES))
-    labels_ph = tf.placeholder(tf.int32, shape=(batch_size))
-    seg_ph = tf.placeholder(tf.int32, shape=(batch_size, point_num))
+    pointclouds_ph = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, point_num, 3))
+    input_label_ph = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, NUM_CATEGORIES))
+    labels_ph = tf.compat.v1.placeholder(tf.int32, shape=(batch_size))
+    seg_ph = tf.compat.v1.placeholder(tf.int32, shape=(batch_size, point_num))
     return pointclouds_ph, input_label_ph, labels_ph, seg_ph
 
 def convert_label_to_one_hot(labels):
@@ -100,7 +100,7 @@ def train():
     with tf.Graph().as_default():
         with tf.device('/gpu:'+str(FLAGS.gpu)):
             pointclouds_ph, input_label_ph, labels_ph, seg_ph = placeholder_inputs()
-            is_training_ph = tf.placeholder(tf.bool, shape=())
+            is_training_ph = tf.compat.v1.placeholder(tf.bool, shape=())
 
             batch = tf.Variable(0, trainable=False)
             learning_rate = tf.train.exponential_decay(
@@ -134,22 +134,22 @@ def train():
             loss, label_loss, per_instance_label_loss, seg_loss, per_instance_seg_loss, per_instance_seg_pred_res  \
                 = model.get_loss(labels_pred, seg_pred, labels_ph, seg_ph, 1.0, end_points)
 
-            total_training_loss_ph = tf.placeholder(tf.float32, shape=())
-            total_testing_loss_ph = tf.placeholder(tf.float32, shape=())
+            total_training_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            total_testing_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
 
-            label_training_loss_ph = tf.placeholder(tf.float32, shape=())
-            label_testing_loss_ph = tf.placeholder(tf.float32, shape=())
+            label_training_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            label_testing_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
 
-            seg_training_loss_ph = tf.placeholder(tf.float32, shape=())
-            seg_testing_loss_ph = tf.placeholder(tf.float32, shape=())
+            seg_training_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            seg_testing_loss_ph = tf.compat.v1.placeholder(tf.float32, shape=())
 
-            label_training_acc_ph = tf.placeholder(tf.float32, shape=())
-            label_testing_acc_ph = tf.placeholder(tf.float32, shape=())
-            label_testing_acc_avg_cat_ph = tf.placeholder(tf.float32, shape=())
+            label_training_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            label_testing_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            label_testing_acc_avg_cat_ph = tf.compat.v1.placeholder(tf.float32, shape=())
 
-            seg_training_acc_ph = tf.placeholder(tf.float32, shape=())
-            seg_testing_acc_ph = tf.placeholder(tf.float32, shape=())
-            seg_testing_acc_avg_cat_ph = tf.placeholder(tf.float32, shape=())
+            seg_training_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            seg_testing_acc_ph = tf.compat.v1.placeholder(tf.float32, shape=())
+            seg_testing_acc_avg_cat_ph = tf.compat.v1.placeholder(tf.float32, shape=())
 
             total_train_loss_sum_op = tf.summary.scalar('total_training_loss', total_training_loss_ph)
             total_test_loss_sum_op = tf.summary.scalar('total_testing_loss', total_testing_loss_ph)

@@ -3,15 +3,18 @@ import numpy as np
 import math
 import sys
 import os
+
+from utils import tf_util
+from transform_nets import input_transform_net, feature_transform_net
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, '../utils'))
-import tf_util
-from transform_nets import input_transform_net, feature_transform_net
+
 
 def placeholder_inputs(batch_size, num_point):
-    pointclouds_pl = tf.placeholder(tf.float32, shape=(batch_size, num_point, 3))
-    labels_pl = tf.placeholder(tf.int32, shape=(batch_size))
+    pointclouds_pl = tf.compat.v1.placeholder(tf.float32, shape=(batch_size, num_point, 3))
+    labels_pl = tf.compat.v1.placeholder(tf.int32, shape=(batch_size))
     return pointclouds_pl, labels_pl
 
 
@@ -84,7 +87,7 @@ def get_loss(pred, label, end_points, reg_weight=0.001):
     K = transform.get_shape()[1].value
     mat_diff = tf.matmul(transform, tf.transpose(transform, perm=[0,2,1]))
     mat_diff -= tf.constant(np.eye(K), dtype=tf.float32)
-    mat_diff_loss = tf.nn.l2_loss(mat_diff) 
+    mat_diff_loss = tf.nn.l2_loss(mat_diff)
     tf.summary.scalar('mat loss', mat_diff_loss)
 
     return classify_loss + mat_diff_loss * reg_weight
