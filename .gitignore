@@ -1,9 +1,6 @@
 # PyCharm
 .idea/
 
-# virtual environment
-virtual_env/
-
 # temporarily saved data
 log/
 dump/
