@@ -11,4 +11,14 @@ indoor3d_sem_seg_hdf5_data/ply_data_all_9.h5
 indoor3d_sem_seg_hdf5_data/ply_data_all_10.h5
 indoor3d_sem_seg_hdf5_data/ply_data_all_11.h5
 indoor3d_sem_seg_hdf5_data/ply_data_all_12.h5
-
+indoor3d_sem_seg_hdf5_data/ply_data_all_13.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_14.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_15.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_16.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_17.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_18.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_19.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_20.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_21.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_22.h5
+indoor3d_sem_seg_hdf5_data/ply_data_all_23.h5
