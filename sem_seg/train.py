@@ -75,7 +75,7 @@ for h5_filename in ALL_FILES:
 data_batches = np.concatenate(data_batch_list, 0)
 data_batches = data_batches[:, 0:NUM_POINT, :]
 label_batches = np.concatenate(label_batch_list, 0)
-label_batches = label_batches[:, 0:NUM_POINT, :]
+label_batches = label_batches[:, 0:NUM_POINT]
 print(data_batches.shape)
 print(label_batches.shape)
 print("ALL BATCHES LOADED")
