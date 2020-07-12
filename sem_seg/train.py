@@ -36,7 +36,6 @@ FLAGS = parser.parse_args()
 BATCH_SIZE = FLAGS.batch_size
 NUM_POINT = FLAGS.num_point
 MAX_EPOCH = FLAGS.max_epoch
-NUM_POINT = FLAGS.num_point
 BASE_LEARNING_RATE = FLAGS.learning_rate
 GPU_INDEX = FLAGS.gpu
 MOMENTUM = FLAGS.momentum
@@ -74,7 +73,9 @@ for h5_filename in ALL_FILES:
     data_batch_list.append(data_batch)
     label_batch_list.append(label_batch)
 data_batches = np.concatenate(data_batch_list, 0)
+data_batches = data_batches[:, 0:NUM_POINT, :]
 label_batches = np.concatenate(label_batch_list, 0)
+label_batches = label_batches[:, 0:NUM_POINT, :]
 print(data_batches.shape)
 print(label_batches.shape)
 print("ALL BATCHES LOADED")
