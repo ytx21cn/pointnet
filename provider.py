@@ -91,10 +91,9 @@ def get_data_files(list_filename):
 
 
 def load_h5(h5_filename):
-    f = h5py.File(h5_filename, 'r')
-    data = f['data'][:]
-    label = f['label'][:]
-    f.close()
+    with h5py.File(h5_filename, 'r') as f:
+        data = f['data'][:]
+        label = f['label'][:]
     return data, label
 
 
@@ -103,11 +102,10 @@ def load_data_file(filename):
 
 
 def load_h5_data_label_seg(h5_filename):
-    f = h5py.File(h5_filename)
-    data = f['data'][:]
-    label = f['label'][:]
-    seg = f['pid'][:]
-    f.close()
+    with h5py.File(h5_filename) as f:
+        data = f['data'][:]
+        label = f['label'][:]
+        seg = f['pid'][:]
     return data, label, seg
 
 
