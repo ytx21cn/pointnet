@@ -7,6 +7,5 @@ rm shapenetcore_partanno_v0.zip
 
 # Download HDF5 for ShapeNet Part segmentation (around 346MB)
 wget --no-check-certificate https://shapenet.cs.stanford.edu/media/shapenet_part_seg_hdf5_data.zip
-unzip shapenet_part_seg_hdf5_data.zip
-rm shapenet_part_seg_hdf5_data.zip
-
+unzip -o shapenet_part_seg_hdf5_data.zip
+#rm shapenet_part_seg_hdf5_data.zip
