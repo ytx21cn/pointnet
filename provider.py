@@ -15,7 +15,7 @@ if not os.path.exists(os.path.join(DATA_DIR, 'modelnet40_ply_hdf5_2048')):
     zipfile = os.path.basename(www)
     os.system('wget --no-check-certificate %s; unzip %s' % (www, zipfile))
     os.system('mv %s %s' % (zipfile[:-4], DATA_DIR))
-    os.system('rm %s' % (zipfile))
+    os.system('rm %s' % zipfile)
 
 
 def shuffle_data(data, labels):
@@ -86,7 +86,7 @@ def jitter_point_cloud(batch_data, sigma=0.01, clip=0.05):
     return jittered_data
 
 
-def getDataFiles(list_filename):
+def get_data_files(list_filename):
     return [line.rstrip() for line in open(list_filename)]
 
 
@@ -97,7 +97,7 @@ def load_h5(h5_filename):
     return data, label
 
 
-def loadDataFile(filename):
+def load_data_file(filename):
     return load_h5(filename)
 
 
@@ -109,5 +109,5 @@ def load_h5_data_label_seg(h5_filename):
     return data, label, seg
 
 
-def loadDataFile_with_seg(filename):
+def load_data_file_with_seg(filename):
     return load_h5_data_label_seg(filename)

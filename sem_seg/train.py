@@ -62,14 +62,14 @@ BN_DECAY_CLIP = 0.99
 
 HOSTNAME = socket.gethostname()
 
-ALL_FILES = provider.getDataFiles('indoor3d_sem_seg_hdf5_data/all_files.txt')
+ALL_FILES = provider.get_data_files('indoor3d_sem_seg_hdf5_data/all_files.txt')
 room_filelist = [line.rstrip() for line in open('indoor3d_sem_seg_hdf5_data/room_filelist.txt')]
 
 # Load ALL data
 data_batch_list = []
 label_batch_list = []
 for h5_filename in ALL_FILES:
-    data_batch, label_batch = provider.loadDataFile(h5_filename)
+    data_batch, label_batch = provider.load_data_file(h5_filename)
     data_batch_list.append(data_batch)
     label_batch_list.append(label_batch)
 data_batches = np.concatenate(data_batch_list, 0)

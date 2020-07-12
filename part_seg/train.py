@@ -188,9 +188,9 @@ def train():
         train_writer = tf.summary.FileWriter(SUMMARIES_FOLDER + '/train', sess.graph)
         test_writer = tf.summary.FileWriter(SUMMARIES_FOLDER + '/test')
 
-        train_file_list = provider.getDataFiles(TRAINING_FILE_LIST)
+        train_file_list = provider.get_data_files(TRAINING_FILE_LIST)
         num_train_file = len(train_file_list)
-        test_file_list = provider.getDataFiles(TESTING_FILE_LIST)
+        test_file_list = provider.get_data_files(TESTING_FILE_LIST)
         num_test_file = len(test_file_list)
 
         fcmd = open(os.path.join(LOG_STORAGE_PATH, 'cmd.txt'), 'w')
@@ -207,7 +207,7 @@ def train():
                 cur_train_filename = os.path.join(hdf5_data_dir, train_file_list[train_file_idx[i]])
                 printout(flog, 'Loading train file ' + cur_train_filename)
 
-                cur_data, cur_labels, cur_seg = provider.loadDataFile_with_seg(cur_train_filename)
+                cur_data, cur_labels, cur_seg = provider.load_data_file_with_seg(cur_train_filename)
                 cur_data, cur_labels, order = provider.shuffle_data(cur_data, np.squeeze(cur_labels))
                 cur_seg = cur_seg[order, ...]
 
@@ -298,7 +298,7 @@ def train():
                 cur_test_filename = os.path.join(hdf5_data_dir, test_file_list[i])
                 printout(flog, 'Loading test file ' + cur_test_filename)
 
-                cur_data, cur_labels, cur_seg = provider.loadDataFile_with_seg(cur_test_filename)
+                cur_data, cur_labels, cur_seg = provider.load_data_file_with_seg(cur_test_filename)
                 cur_labels = np.squeeze(cur_labels)
 
                 cur_labels_one_hot = convert_label_to_one_hot(cur_labels)

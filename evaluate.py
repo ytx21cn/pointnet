@@ -45,9 +45,9 @@ SHAPE_NAMES = [line.rstrip() for line in
 HOSTNAME = socket.gethostname()
 
 # ModelNet40 official train/test split
-TRAIN_FILES = provider.getDataFiles(
+TRAIN_FILES = provider.get_data_files(
     os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048/train_files.txt'))
-TEST_FILES = provider.getDataFiles(
+TEST_FILES = provider.get_data_files(
     os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048/test_files.txt'))
 
 
@@ -102,7 +102,7 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
     fout = open(os.path.join(DUMP_DIR, 'pred_label.txt'), 'w')
     for fn in range(len(TEST_FILES)):
         log_string('----' + str(fn) + '----')
-        current_data, current_label = provider.loadDataFile(TEST_FILES[fn])
+        current_data, current_label = provider.load_data_file(TEST_FILES[fn])
         current_data = current_data[:, 0:NUM_POINT, :]
         current_label = np.squeeze(current_label)
         print(current_data.shape)
