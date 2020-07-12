@@ -501,8 +501,8 @@ def bbox_label_to_obj_room(input_filename, out_filename_prefix, easy_view=False,
         z = bbox[i, 2]
         color = np.array(g_label2color[label[i]], dtype=float) / 255.0
 
-        material = 'material%d' % (ins_cnt)
-        fout_obj.write('usemtl %s\n' % (material))
+        material = 'material%d' % ins_cnt
+        fout_obj.write('usemtl %s\n' % material)
         fout_obj.write('v %f %f %f\n' % (x, y, z + c))
         fout_obj.write('v %f %f %f\n' % (x, y + b, z + c))
         fout_obj.write('v %f %f %f\n' % (x + a, y + b, z + c))
