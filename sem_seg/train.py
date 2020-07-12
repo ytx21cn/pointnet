@@ -83,7 +83,10 @@ time.sleep(10)
 test_area = 'Area_' + str(FLAGS.test_area)
 train_idxs = []
 test_idxs = []
-print(len(room_filelist))
+print('Room filelist length: %d' % len(room_filelist),
+      'Data batches length: %d' % len(data_batches),
+      'Label batches length: %d' % len(label_batches),
+      sep='\n')
 for i, room_name in enumerate(room_filelist):
     if test_area in room_name:
         test_idxs.append(i)
