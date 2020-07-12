@@ -79,7 +79,7 @@ label_batches = label_batches[:, 0:NUM_POINT]
 print(data_batches.shape)
 print(label_batches.shape)
 print("ALL BATCHES LOADED")
-time.sleep(10)
+# time.sleep(10)
 
 test_area = 'Area_' + str(FLAGS.test_area)
 train_idxs = []
@@ -101,7 +101,7 @@ test_label = label_batches[test_idxs]
 print(train_data.shape, train_label.shape)
 print(test_data.shape, test_label.shape)
 print("ALL DATA LOADED")
-time.sleep(10)
+# time.sleep(10)
 
 
 def log_string(out_str):
@@ -172,7 +172,7 @@ def train():
         config.log_device_placement = True
         sess = tf.Session(config=config)
         print("SESSION CREATED")
-        time.sleep(10)
+        # time.sleep(10)
 
         # Add summary writers
         merged = tf.summary.merge_all()
@@ -193,7 +193,7 @@ def train():
                'step': batch}
 
         print("VARIABLE INITIALIZED")
-        time.sleep(10)
+        # time.sleep(10)
 
         for epoch in range(MAX_EPOCH):
             log_string('**** EPOCH %03d ****' % epoch)
