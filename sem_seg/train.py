@@ -166,6 +166,8 @@ def train():
         config.allow_soft_placement = True
         config.log_device_placement = True
         sess = tf.Session(config=config)
+        print("SESSION CREATED")
+        time.sleep(10)
 
         # Add summary writers
         merged = tf.summary.merge_all()
