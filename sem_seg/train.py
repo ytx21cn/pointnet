@@ -7,6 +7,7 @@ import socket
 
 import os
 import sys
+import time
 
 import provider
 from utils import tf_util
@@ -76,6 +77,8 @@ data_batches = np.concatenate(data_batch_list, 0)
 label_batches = np.concatenate(label_batch_list, 0)
 print(data_batches.shape)
 print(label_batches.shape)
+print("ALL BATCHES LOADED")
+time.sleep(10)
 
 test_area = 'Area_' + str(FLAGS.test_area)
 train_idxs = []
@@ -92,6 +95,8 @@ test_data = data_batches[test_idxs, ...]
 test_label = label_batches[test_idxs]
 print(train_data.shape, train_label.shape)
 print(test_data.shape, test_label.shape)
+print("ALL DATA LOADED")
+time.sleep(10)
 
 
 def log_string(out_str):
