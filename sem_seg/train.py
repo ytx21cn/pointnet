@@ -164,8 +164,7 @@ def train():
 
         # Add summary writers
         merged = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'),
-                                             sess.graph)
+        train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'), sess.graph)
         test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'))
 
         # Init variables
